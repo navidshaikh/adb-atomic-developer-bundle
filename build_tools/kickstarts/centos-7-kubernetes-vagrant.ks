@@ -92,6 +92,9 @@ ExecStart=/usr/bin/kube-apiserver \\
 Restart=on-failure
 LimitNOFILE=65536
 
+# Fixes issue #71
+sed -i.back '/KUBE_ADMISSION_CONTROL=*/c\KUBE_ADMISSION_CONTROL="--admission_control=NamespaceLifecycle,NamespaceExists,LimitRanger,SecurityContextDeny,ResourceQuota"' /etc/kubernetes/apiserver
+
 [Install]
 WantedBy=multi-user.target
 EOF
