@@ -123,6 +123,10 @@ echo "ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEA6NF8iallvQVp22WDkTkyrtvp9eWW6A8YVr+kz4
 chmod 600 /home/vagrant/.ssh/authorized_keys
 chown -R vagrant:vagrant /home/vagrant/.ssh
 
+# Generate certs pair for configuring TLS enabled docker daemon
+
+. /etc/sysconfig/docker
+
 function randomString {
         # if a param was passed, it's the length of the string we want
         if [[ -n $1 ]] && [[ "$1" -lt 20 ]]; then
@@ -197,5 +201,10 @@ chmod -v 0400 $DOCKER_CERT_PATH/ca.pem $DOCKER_CERT_PATH/server-cert.pem $DOCKER
 ## Remove remaining files
 cd
 echo rm -rf $dir
+
+# End of certs pair generation steps for TLS enabled docker daemon
+
+# update the docker config to listen on TCP as well as unix socket
+sed -i.back '/OPTIONS=*/c\OPTIONS="--selinux-enabled -H tcp://0.0.0.0:2376 -H unix:///var/run/docker.sock --tlscacert=/etc/docker/ca.pem --tlscert=/etc/docker/server-cert.pem --tlskey=/etc/docker/server-key.pem --tlsverify"' /etc/sysconfig/docker
 
 %end
