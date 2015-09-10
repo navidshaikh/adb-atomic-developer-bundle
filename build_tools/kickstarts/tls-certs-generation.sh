@@ -4,7 +4,7 @@
 # description   : Certs pair generation script for configuring TLS enabled docker daemon
 # author        : Brian Exelbierd <bexelbie@redhat.com>
 # use           : sudo bash tls-certs-generation.sh
-# version       : 0.1.0
+# version       : 0.1.1
 
 # Generate Certificates to use with the docker daemon
 # Instructions sourced from http://docs.docker.com/articles/https/
@@ -24,11 +24,7 @@ function randomString {
                 local myStrLength=8;
         fi
 
-        local mySeedNumber=$$`date +%N`; # seed will be the pid + nanoseconds
-        local myRandomString=$( echo $mySeedNumber | md5sum | md5sum );
-        # create our actual random string
-        #myRandomResult="${myRandomString:2:myStrLength}"
-        echo "${myRandomString:2:myStrLength}"
+        dd if=/dev/urandom bs=1 2>/dev/null | tr -dc '[:alnum:]' | dd bs=1 count=$myStrLength 2>/dev/null
 }
 
 # Get a temporary workspace
